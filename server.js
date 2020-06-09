@@ -6,7 +6,7 @@ const app = express()
 const PORT = process.env.PORT || 8000
 const cors = require('cors');
 require('dotenv').config()
-
+const moment = require('moment')
 
 //////////////////////////
 // Globals
@@ -23,7 +23,6 @@ require('dotenv').config()
 //         }
 //     },
 // };
-
 
 //////////////////////////
 // Database
@@ -66,6 +65,58 @@ app.use(express.static('build'))
 
 app.get('/', (req, res) => {
     res.send('Hello Turnout!')
+})
+
+//////////////////////////
+// Show Route
+//////////////////////////
+
+app.get('/events/:id', async (req, res) => {
+    try {
+        const oneEvent = await Event.findById(req.params.id)
+        res.status(200).json(oneEvent)
+    } catch (error) {
+        res.status(400).json(error)
+    }
+})
+
+
+//////////////////////////
+// Index Route
+//////////////////////////
+
+app.get('/events', async (req, res) => {
+    try {
+        const allEvents = await Event.find({})
+        res.status(200).json(allEvents)
+    } catch (error) {
+        res.status(400).json(error)
+    }
+})
+//////////////////////////
+// Create Routes
+//////////////////////////
+
+app.post('/events', async (req, res) => {
+    try {
+        const newEvent = await Event.create({
+            title: req.body.title,
+            category: req.body.category,
+            date: req.body.date,
+            location: req.body.location,
+            images: [{
+                image: req.body.images
+            }]
+        }, (err, createdEvent) => {
+            if (err){
+                console.log(err);
+            } else {
+                res.status(200).json(createdEvent)
+            }
+        })
+    } catch (error) {
+        res.status(400).json(error)
+    }
 })
 
 //////////////////////////

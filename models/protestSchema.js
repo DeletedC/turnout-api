@@ -19,19 +19,23 @@ const protestSchema = new Schema({
         unique: false
     },
     location: {
-        type: String
+        type: String,
+        required: true,
+
     },
     images: [{
         type: Object,
-        required: true
+        required: false,
+        unique: false
     }],
     attendees: [{
-        category: String,
         user_id: String
     }]
 }, {
     timestamps: true
 });
 
-const Protest = mongoose.model('Protest', protestSchema);
-module.exports = Protest;
+const Event = mongoose.model('Event', protestSchema);
+module.exports = Event;
+
+// will need to make date required
