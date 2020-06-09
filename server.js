@@ -67,6 +67,24 @@ app.get('/', (req, res) => {
     res.send('Hello Turnout!')
 })
 
+//////////////////////////
+// Show Route
+//////////////////////////
+
+app.get('/events/:id', async (req, res) => {
+    try {
+        const oneEvent = await Event.findById(req.params.id)
+        res.status(200).json(oneEvent)
+    } catch (error) {
+        res.status(400).json(error)
+    }
+})
+
+
+//////////////////////////
+// Index Route
+//////////////////////////
+
 app.get('/events', async (req, res) => {
     try {
         const allEvents = await Event.find({})
@@ -75,6 +93,9 @@ app.get('/events', async (req, res) => {
         res.status(400).json(error)
     }
 })
+//////////////////////////
+// Create Routes
+//////////////////////////
 
 app.post('/events', async (req, res) => {
     try {
