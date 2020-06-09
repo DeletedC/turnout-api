@@ -1,3 +1,4 @@
 const moment = require('moment')
 const time = moment()
-console.log(time);
+
+const fourth = new Date(2020, 06, 04, 12)

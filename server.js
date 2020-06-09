@@ -120,6 +120,39 @@ app.post('/events', async (req, res) => {
 })
 
 //////////////////////////
+// Update Route
+//////////////////////////
+
+app.put('/events/:id', async (req, res) => {
+   try {
+       const editEvent = await Event.findByIdAndUpdate(req.params.id, {
+        title: req.body.title,
+        category: req.body.category,
+        date: req.body.date,
+        location: req.body.location,
+        images: [{
+            image: req.body.images
+        }]
+       }, (err, editedEvent) => {
+           res.status(200).json(editedEvent)
+       })
+   } catch (error) {
+     res.status(400).json(error)  
+   }
+})
+//////////////////////////
+// Delete Routes
+//////////////////////////
+app.delete('/events/:id', async (req, res) => {
+    try {
+        const deletedEvent = await Event.findByIdAndDelete(req.params.id)
+        res.status(200).json(deletedEvent)
+    } catch (error) {
+        res.status(400).json(error)
+    }
+})
+
+//////////////////////////
 // Listener
 //////////////////////////
 app.listen(PORT, () => console.log("Listening on port:", PORT));
