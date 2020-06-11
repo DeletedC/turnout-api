@@ -99,12 +99,6 @@ app.get('/events', async (req, res) => {
 //////////////////////////
 
 app.post('/events', async (req, res) => {
-    // massage date data
-    // then place it on line 108 in the Event create
-    // console.log(req.body);
-    // console.log('am/pm',req.body.amOrPm);
-    // console.log('hours',req.body.hours);
-    // console.log('min',req.body.minutes);
     try {
         let hour = req.body.hours < 10?'0' + req.body.hours: req.body.hours
         // console.log('hours fixed',hour);
