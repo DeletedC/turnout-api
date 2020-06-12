@@ -7,12 +7,14 @@ const PORT = process.env.PORT || 8000
 const cors = require('cors');
 require('dotenv').config()
 const moment = require('moment')
+const bcrypt = require('bcryptjs')
+
 
 //////////////////////////
 // Globals
 //////////////////////////
 // List of urls our API will accept calls from
-// const whitelist = ['http://localhost:3000']
+const whitelist = ['http://localhost:3000']
 
 // const corsOptions = {
 //     origin: function (origin, callback) {
@@ -40,7 +42,7 @@ mongoose.connection.on('disconnected', () => console.log('mongo disconnected'));
 
 //...farther down the page
 
-mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true,  useCreateIndex: true});
 mongoose.connection.once('open', () => {
 console.log('connected to mongoose...');
 });
@@ -49,8 +51,14 @@ console.log('connected to mongoose...');
 // Models
 //////////////////////////
 
-const User = require('./models/userSchema.js')
 const Event = require('./models/protestSchema.js')
+
+//////////////////////////
+// Controllers
+//////////////////////////
+
+const usersController = require('./controllers/usersController.js')
+
 //////////////////////////
 // Middleware
 //////////////////////////
@@ -59,6 +67,8 @@ const Event = require('./models/protestSchema.js')
 app.use(express.json())
 app.use(express.static('build'))
 
+
+app.use('/users', usersController)
 //////////////////////////
 // Routes
 //////////////////////////
@@ -66,6 +76,7 @@ app.use(express.static('build'))
 app.get('/', (req, res) => {
     res.send('Hello Turnout!')
 })
+
 
 //////////////////////////
 // Show Route
@@ -99,21 +110,50 @@ app.get('/events', async (req, res) => {
 
 app.post('/events', async (req, res) => {
     try {
-        const newEvent = await Event.create({
-            title: req.body.title,
-            category: req.body.category,
-            date: req.body.date,
-            location: req.body.location,
-            images: [{
-                image: req.body.images
-            }]
-        }, (err, createdEvent) => {
-            if (err){
-                console.log(err);
-            } else {
-                res.status(200).json(createdEvent)
-            }
-        })
+        let hour = req.body.hours < 10?'0' + req.body.hours: req.body.hours
+        // console.log('hours fixed',hour);
+        if(req.body.amOrPm === 'PM'){
+            let PM = parseInt(hour) + 12
+            const eventDate = await new Date(`${req.body.date}T${PM}:${req.body.minutes}:00`)
+            console.log(eventDate);
+            console.log("went at PM");
+            const newEvent = await Event.create({
+                title: req.body.title,
+                category: req.body.category,
+                date: eventDate,
+                location: req.body.location,
+                images: [{
+                    image: req.body.images
+                }]
+            }, (err, createdEvent) => {
+                if (err){
+                    console.log(err);
+                } else {
+                    console.log(createdEvent);
+                    res.status(200).json(createdEvent)
+                }
+            })
+        } else {
+            console.log("went at AM");
+            const eventDate = await new Date(`${req.body.date}T${hour}:${req.body.minutes}:00`)
+            console.log(eventDate);
+            const newEvent = await Event.create({
+                title: req.body.title,
+                category: req.body.category,
+                date: eventDate,
+                location: req.body.location,
+                images: [{
+                    image: req.body.images
+                }]
+            }, (err, createdEvent) => {
+                if (err){
+                    console.log(err);
+                } else {
+                    console.log(createdEvent);
+                    res.status(200).json(createdEvent)
+                }
+            })
+        }
     } catch (error) {
         res.status(400).json(error)
     }
