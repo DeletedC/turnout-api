@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 8000
 const cors = require('cors');
 require('dotenv').config()
 const moment = require('moment')
+const bcrypt = require('bcryptjs')
 
 
 //////////////////////////
@@ -41,7 +42,7 @@ mongoose.connection.on('disconnected', () => console.log('mongo disconnected'));
 
 //...farther down the page
 
-mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true,  useCreateIndex: true});
 mongoose.connection.once('open', () => {
 console.log('connected to mongoose...');
 });
@@ -50,8 +51,14 @@ console.log('connected to mongoose...');
 // Models
 //////////////////////////
 
-const User = require('./models/userSchema.js')
 const Event = require('./models/protestSchema.js')
+
+//////////////////////////
+// Controllers
+//////////////////////////
+
+const usersController = require('./controllers/usersController.js')
+
 //////////////////////////
 // Middleware
 //////////////////////////
@@ -60,6 +67,8 @@ app.use(cors(corsOptions)) // cors middlewear, configured by corsOptions
 app.use(express.json())
 app.use(express.static('build'))
 
+
+app.use('/users', usersController)
 //////////////////////////
 // Routes
 //////////////////////////
@@ -67,6 +76,7 @@ app.use(express.static('build'))
 app.get('/', (req, res) => {
     res.send('Hello Turnout!')
 })
+
 
 //////////////////////////
 // Show Route
