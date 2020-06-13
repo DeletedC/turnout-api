@@ -36,7 +36,7 @@ const authCheck = (req, res, next) => {
 router.post('/signup', async (req, res) => {
     try {
         // Destructuring the request body
-        const { username, password, passwordCheck, email, firstName, lastName } = req.body
+        let { username, password, passwordCheck, email, firstName, lastName } = req.body
         // Validations        
         if (!email || !password || !passwordCheck || !username)
             return res.status(400).json({msg: "not all fields have been entered"})
@@ -45,11 +45,7 @@ router.post('/signup', async (req, res) => {
         if (password !== passwordCheck)
             return res.status(400).json({msg: 'Passwords do not match'})
 
-        const existingUser = await User.findOne({email: email, username: username},
-            (err, foundUser) => {
-                res.status(400).json({msg: "A user with this email or password already exists"})
-                console.log('hey2',foundUser);
-        })
+        const existingUser = await User.findOne({email: email})
         if (existingUser)
             return res.status(400).json({msg: "Account with this email already exists"})
         // End Validations
@@ -64,17 +60,11 @@ router.post('/signup', async (req, res) => {
             username: username,
             firstName: firstName,
             lastName: lastName,
-        }, (err, createdUser) => {
-            if (err){
-                console.log(err);
-                res.status(500).json(err)
-            } else {
-                console.log('hey',createdUser)
-                res.status(200).json(createdUser)
-            }
-        })
+        });
+        const savedUser = await newUser.save();
+        res.json(savedUser)
     } catch (error) {
-        res.status(500).json(error)    
+        res.status(500).json({ error: error.message })    
     }
 })
 //////////////////////////
@@ -98,8 +88,7 @@ router.post('/login', async (req, res) => {
             token,
             user: {
                 id: user._id,
-                username: user.username,
-                email: user.email
+                username: user.username
             },
         })
     } catch (error) {
