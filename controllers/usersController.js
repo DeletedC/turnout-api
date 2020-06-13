@@ -57,7 +57,6 @@ router.post('/signup', async (req, res) => {
         const salt = await bcrypt.genSalt(10)
         const passwordHash = await bcrypt.hash(password, salt)
 
-
         // User Create 
         const newUser = await User.create({
             email: email,
@@ -86,7 +85,7 @@ router.post('/login', async (req, res) => {
     try {
         const { username, password } = req.body;
         if (!password || !username) 
-            return res.status(400).json({msg: "Not all fiels have been entered"})
+            return res.status(400).json({msg: "Not all fields have been entered"})
         const user = await User.findOne({username: username})
         if (!user)
             return res.status(400).json({msg: 'Account does not exist'})
@@ -133,6 +132,18 @@ router.post('/tokenisvalid', async (req, res) => {
         return res.json(true)
     } catch (error) {
         res.status(500).json({msg: error.message})
+    }
+})
+
+router.get('/', authCheck, async (req, res) => {
+    try {
+        const findUser = await User.findById(req.user)
+        res.status(200).json({
+            username: findUser.username,
+            id: findUser._id
+        })
+    } catch (error) {
+        res.status(400).json(error)        
     }
 })
 
