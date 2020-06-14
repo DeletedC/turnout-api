@@ -14,7 +14,7 @@ const bcrypt = require('bcryptjs')
 // Globals
 //////////////////////////
 // List of urls our API will accept calls from
-const whitelist = ['http://localhost:3000', 'https://turnout-node-react.herokuapp.com/']
+const whitelist = ['http://localhost:3000', 'https://suspicious-wiles-3fc7d0.netlify.app/']
 
 const corsOptions = (req, callback) => {
   let corsOptions;
