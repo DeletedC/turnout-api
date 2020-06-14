@@ -32,7 +32,7 @@ const corsOptions = (req, callback) => {
 
 const db = mongoose.connection
 const MONGODB_URI =
-    process.env.MONGODB_URL || 'mongodb://localhost:27017/turnout';
+    process.env.MONGODB_URI || 'mongodb://localhost:27017/turnout';
 
 // Error / Disconnection
 mongoose.connection.on('error', (err) =>
